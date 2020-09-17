@@ -1,0 +1,38 @@
+{
+  "name": "banking-api",
+  "version": "0.0.1",
+  "description": "A banking API for Spendesk :)",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MeuhMeuh/banking-api.git"
+  },
+  "author": "MeuhMeuh",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "bugs": {
+    "url": "https://github.com/MeuhMeuh/banking-api/issues"
+  },
+  "homepage": "https://github.com/MeuhMeuh/banking-api#readme",
+  "dependencies": {
+    "@hapi/hapi": "^20.0.0",
+    "@hapi/inert": "^6.0.2",
+    "@hapi/vision": "^6.0.1",
+    "config": "^3.3.1",
+    "hapi-swagger": "^14.0.0",
+    "joi": "^17.2.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "eslint": "^7.9.0",
+    "husky": "^4.3.0"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
+}
