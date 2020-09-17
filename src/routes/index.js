@@ -11,7 +11,6 @@ let routes = [];
 ['card', 'wallet'].forEach(subDirectory => {
   fs.readdirSync(`${__dirname}/${subDirectory}`)
     .forEach(file => {
-      console.log(file);
       routes = routes.concat(require(`./${subDirectory}/${file}`))
     });
 });
