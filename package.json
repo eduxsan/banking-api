@@ -17,14 +17,17 @@
   },
   "homepage": "https://github.com/MeuhMeuh/banking-api#readme",
   "dependencies": {
+    "@hapi/boom": "^9.1.0",
     "@hapi/hapi": "^20.0.0",
     "@hapi/inert": "^6.0.2",
     "@hapi/joi": "^17.1.1",
     "@hapi/vision": "^6.0.1",
     "config": "^3.3.1",
+    "date-fns": "^2.16.1",
     "hapi-swagger": "^14.0.0",
     "joi": "^17.2.1",
     "knex": "^0.21.5",
+    "lodash": "^4.17.20",
     "pg": "^8.3.3",
     "uuid": "^8.3.0"
   },
