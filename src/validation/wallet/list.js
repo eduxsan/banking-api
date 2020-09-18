@@ -14,16 +14,12 @@ module.exports = {
     },
   },
   responseSchema: Joi.array().items(
-    // Joi.object({
-    //   cardUuid: Joi.string().uuid().required(),
-    //   walletUuid: Joi.string().uuid().required(),
-    //   currencyCode: Joi.string().required(),
-    //   balance: Joi.number().integer().positive().allow(0).required(),
-    //   number: Joi.string().required(),
-    //   expirationDate: Joi.date().required(),
-    //   ccv: Joi.string().length(3).required(),
-    //   userUuid: Joi.string().uuid().required(),
-    //   status: Joi.string().valid(CARD_STATUS.ACTIVE, CARD_STATUS.BLOCKED),
-    // }),
+    Joi.object({
+      walletUuid: Joi.string().uuid().required(),
+      balance: Joi.number().integer().positive().allow(0).required(),
+      currencyCode: Joi.string().required(),
+      companyUuid: Joi.string().uuid().required(),
+      isMasterWallet: Joi.boolean().required(),
+    }),
   ).required(),
 }

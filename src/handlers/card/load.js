@@ -69,7 +69,7 @@ module.exports = async (
         newCardAmount: card.balance + amount,
         cardUuid: card.cardUuid,
       },
-    )
+    ).transacting(trx);
   });
 
   return h.response({ cardUuid }).code(200);
