@@ -125,3 +125,7 @@ You should have access to a UI listing all the endpoints at [http://0.0.0.0:4321
 > It may be at another location if you changed the host & port combination.
 
 You'll also have access to the according `swagger` JSON file at [http://0.0.0.0:4321/swagger.json](http://0.0.0.0:4321/swagger.json)
+
+## 6. Have fun 😊
+
+Do not hesitate to reach me for any question / any issue when setting up the project 😃
