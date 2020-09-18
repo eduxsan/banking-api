@@ -2,7 +2,7 @@
 
 const { HEADERS } = require('../../constants');
 const knex = require('../../knex');
-const { formatCardOutput } = require('../../util/format-card-output');
+const { formatCardOutput } = require('../../util/formatters/format-card-output');
 
 module.exports = async ({ headers: {[HEADERS.USER_IDENTIFIER]: userId } }, h) => {
   // Assuming that we list all the cards, even the blocked ones.

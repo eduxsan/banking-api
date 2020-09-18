@@ -3,16 +3,16 @@
 const Boom = require('@hapi/boom');
 const get = require('lodash/get');
 
-const { HEADERS } = require('../../constants');
+const { HEADERS, CARD_STATUS } = require('../../constants');
 const knex = require('../../knex');
-const { isLoadOperationFeasible } = require('../../util/is-load-operation-feasible');
 const { formatCardOutput } = require('../../util/formatters/format-card-output');
+const { formatWalletOutput } = require('../../util/formatters/format-wallet-output');
 const { isCardBlocked } = require('../../util/is-card-blocked');
 
 module.exports = async (
   {
     headers: {[HEADERS.COMPANY_IDENTIFIER]: companyId, [HEADERS.USER_IDENTIFIER]: userId },
-    payload: { cardUuid, amount },
+    payload: { cardUuid },
   },
   h,
 ) => {
@@ -44,32 +44,32 @@ module.exports = async (
   }
 
   const card = formatCardOutput(cardInformation);
+  const wallet = formatWalletOutput({ balance: walletBalance });
 
   if (isCardBlocked(card)) {
-    throw Boom.badRequest('The given card is blocked and thus no load operation is allowed');
+    throw Boom.badRequest('Given card is already blocked');
   }
 
-  if (!isLoadOperationFeasible({ wallet: { balance: walletBalance }, card, amount })) {
-    throw Boom.badRequest('Load operation is not feasible with the provided amount');
-  }
-
-  // The load operation is feasible - we'll perform both the amount changes in a single transaction
-  // to ensure an amount consistency between both the card & its associated wallet
   await knex.transaction(async (trx) => {
     await knex.raw(
-      'UPDATE wallet SET balance = :newWalletAmount WHERE wallet_uuid = :walletUuid',
+      'UPDATE card SET balance = 0, status = :blockedStatus WHERE card_uuid = :cardUuid',
       {
-        newWalletAmount: walletBalance - amount,
-        walletUuid: card.walletUuid,
+        blockedStatus: CARD_STATUS.BLOCKED,
+        cardUuid,
       },
     ).transacting(trx);
-    await knex.raw(
-      'UPDATE card SET balance = :newCardAmount WHERE card_uuid = :cardUuid',
-      {
-        newCardAmount: card.balance + amount,
-        cardUuid: card.cardUuid,
-      },
-    )
+
+    // We update 
+    if (0 < card.balance) {
+      console.log(card.walletUuid);
+      await knex.raw(
+        'UPDATE wallet SET balance = :newWalletBalance WHERE wallet_uuid = :walletUuid',
+        {
+          newWalletBalance: parseInt(wallet.balance, 10) + card.balance,
+          walletUuid: card.walletUuid,
+        },
+      );
+    }
   });
 
   return h.response({ cardUuid }).code(200);

@@ -2,7 +2,7 @@
 
 const { HEADERS } = require('../../constants');
 const knex = require('../../knex');
-const { formatWalletOutput } = require('../../util/format-wallet-output');
+const { formatWalletOutput } = require('../../util/formatters/format-wallet-output');
 
 module.exports = async ({ headers: {[HEADERS.USER_IDENTIFIER]: userId } }, h) => {
   // I assume that this method is listing wallets for a given USER and not a given company.
