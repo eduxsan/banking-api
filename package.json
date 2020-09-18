@@ -1,6 +1,6 @@
 {
   "name": "banking-api",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A banking API for Spendesk :)",
   "main": "index.js",
   "scripts": {
