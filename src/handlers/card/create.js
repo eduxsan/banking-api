@@ -1,12 +1,12 @@
 'use strict';
 
-const Boom = require('@hapi/boom');
+const { v4: uuidv4 } = require('uuid');
+
 const { HEADERS, CARD_STATUS } = require('../../constants');
-const get = require('lodash/get');
+const knex = require('../../knex');
+const { getWallet } = require('../../persistence/wallet/get-wallet');
 const { generateCardNumber, generateCcv } = require('../../util/generate-card-number');
 const { getCardExpirationDate } = require('../../util/get-card-expiration-date');
-const knex = require('../../knex');
-const { v4: uuidv4 } = require('uuid');
 
 module.exports = async (
   {
@@ -16,16 +16,10 @@ module.exports = async (
   h,
 ) => {
   // Retrieving the related wallet & matching it to given parameters
-  const walletResult = await knex.raw(
-    'SELECT * FROM wallet WHERE wallet_uuid = :walletUuid LIMIT 1',
-    { walletUuid },
-  );
-  const wallet = get(walletResult, 'rows[0]');
-
-  // Considering that having a wrong company uuid is a mismatch leading to no known wallet
-  if (undefined === wallet || wallet.company_uuid !== companyId) {
-    throw Boom.notFound('Could not find any wallet associated to given parameters');
-  }
+  const wallet = await getWallet({
+    walletUuid,
+    companyUuid: companyId,
+  });
 
   const cardUuid = uuidv4();
 
@@ -54,8 +48,8 @@ module.exports = async (
       );
     `, {
     cardUuid,
-    walletUuid: wallet.wallet_uuid,
-    currencyCode: wallet.currency_code,
+    walletUuid: wallet.walletUuid,
+    currencyCode: wallet.currencyCode,
     balance: 0, // By default, assuming that a new card has no money on it
     number: generateCardNumber(),
     expirationDate: getCardExpirationDate(new Date()),

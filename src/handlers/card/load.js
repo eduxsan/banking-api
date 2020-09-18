@@ -1,13 +1,15 @@
 'use strict';
 
 const Boom = require('@hapi/boom');
-const get = require('lodash/get');
 
 const { HEADERS } = require('../../constants');
 const knex = require('../../knex');
-const { isLoadOperationFeasible } = require('../../util/is-load-operation-feasible');
-const { formatCardOutput } = require('../../util/formatters/format-card-output');
+const { updateCardBalance } = require('../../persistence/card/update-card-balance');
+const { getCard } = require('../../persistence/card/get-card');
+const { getWallet } = require('../../persistence/wallet/get-wallet');
+const { updateWalletBalance } = require('../../persistence/wallet/update-wallet-balance');
 const { isCardBlocked } = require('../../util/is-card-blocked');
+const { isLoadOperationFeasible } = require('../../util/is-load-operation-feasible');
 
 module.exports = async (
   {
@@ -18,58 +20,36 @@ module.exports = async (
 ) => {
   // Retrieving the card & its associated wallet to match the request user/company combination
   // and assess the load operation feasibility.
-  const cardAndWalletInformation = await knex.raw(
-    `
-      SELECT c.*, w.balance as wallet_balance
-      FROM card c
-      JOIN wallet w USING (wallet_uuid)
-      WHERE c.card_uuid = :cardUuid
-      AND c.user_uuid = :userUuid
-      AND w.company_uuid = :companyUuid
-    `,
-    {
-      cardUuid,
-      userUuid: userId,
-      companyUuid: companyId,
-    },
-  );
-
-  const {
-    wallet_balance: walletBalance,
-    ...cardInformation
-  } = get(cardAndWalletInformation, 'rows[0]');
-
-  if (undefined === cardInformation) {
-    throw Boom.notFound('Could not find any card associated to given parameters');
-  }
-
-  const card = formatCardOutput(cardInformation);
+  const card = await getCard({
+    cardUuid,
+    userUuid: userId,
+  });
 
   if (isCardBlocked(card)) {
     throw Boom.badRequest('The given card is blocked and thus no load operation is allowed');
   }
 
-  if (!isLoadOperationFeasible({ wallet: { balance: walletBalance }, card, amount })) {
+  const wallet = await getWallet({
+    walletUuid: card.walletUuid,
+    companyUuid: companyId,
+  });
+
+  if (!isLoadOperationFeasible({ wallet: { balance: wallet.balance }, card, amount })) {
     throw Boom.badRequest('Load operation is not feasible with the provided amount');
   }
 
   // The load operation is feasible - we'll perform both the amount changes in a single transaction
   // to ensure an amount consistency between both the card & its associated wallet
   await knex.transaction(async (trx) => {
-    await knex.raw(
-      'UPDATE wallet SET balance = :newWalletAmount WHERE wallet_uuid = :walletUuid',
-      {
-        newWalletAmount: walletBalance - amount,
-        walletUuid: card.walletUuid,
-      },
-    ).transacting(trx);
-    await knex.raw(
-      'UPDATE card SET balance = :newCardAmount WHERE card_uuid = :cardUuid',
-      {
-        newCardAmount: card.balance + amount,
-        cardUuid: card.cardUuid,
-      },
-    ).transacting(trx);
+    await updateWalletBalance({
+      walletUuid: card.walletUuid,
+      balance: wallet.balance - amount,
+    }).transacting(trx);
+
+    await updateCardBalance({
+      cardUuid: card.cardUuid,
+      balance: card.balance + amount,
+    }).transacting(trx);
   });
 
   return h.response({ cardUuid }).code(200);

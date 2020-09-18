@@ -1,12 +1,10 @@
 'use strict';
 
 const { HEADERS } = require('../../constants');
-const knex = require('../../knex');
-const { formatCardOutput } = require('../../util/formatters/format-card-output');
+const { getUserCards } = require('../../persistence/card/get-card');
 
-module.exports = async ({ headers: {[HEADERS.USER_IDENTIFIER]: userId } }, h) => {
-  // Assuming that we list all the cards, even the blocked ones.
-  return knex
-    .raw('SELECT * FROM card WHERE user_uuid = :userUuid', { userUuid: userId})
-    .then(result => h.response(result.rows.map(formatCardOutput)).code(200))
-};
+// Assuming that we list all the cards, even the blocked ones.
+module.exports = (
+  { headers: {[HEADERS.USER_IDENTIFIER]: userId } },
+  h,
+) => getUserCards({ userUuid: userId }).then(cards => h.response(cards).code(200)); 
