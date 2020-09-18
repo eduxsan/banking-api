@@ -4,7 +4,7 @@
   "description": "A banking API for Spendesk :)",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -37,6 +37,7 @@
     "@commitlint/config-conventional": "^11.0.0",
     "eslint": "^7.9.0",
     "husky": "^4.3.0",
+    "jest": "^26.4.2",
     "nodemon": "^2.0.4"
   },
   "husky": {
