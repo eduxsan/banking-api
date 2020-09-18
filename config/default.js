@@ -1,6 +1,8 @@
 'use strict';
 
 module.exports = {
+  // Allowed currencies
+  currencies: ['USD', 'EUR', 'GBP'],
   database: {
     engine: 'pg',
     connection: {

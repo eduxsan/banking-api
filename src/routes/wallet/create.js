@@ -1,17 +1,41 @@
 'use strict';
 
-const knex = require('../knex');
+const { currencies } = require('config');
+const Joi = require('joi');
+
+const handler = require('../../handlers/wallet/create');
+const { HEADERS } = require('../../constants');
+
+const validate = {
+  headers: Joi.object({
+    [HEADERS.COMPANY_IDENTIFIER]: Joi.string().uuid().required(),
+  }),
+  payload: Joi.object({
+    currencyCode: Joi.string().length(3).valid(...currencies).required(),
+    balance: Joi.number().integer().positive().required(),
+    isMasterWallet: Joi.boolean().required(),
+  }),
+  options: {
+    allowUnknown: true,
+  },
+  failAction: (request, h, err) => {
+
+    throw err;
+  },
+};
 
 module.exports = {
-  method: 'GET',
+  method: 'POST',
   path: '/wallet',
   options: {
     tags: ['api'],
+    validate,
+    description: 'Creates a wallet',
+    response: {
+      schema: Joi.object({
+        walletUuid: Joi.string().uuid().required(),
+      }),
+    },
   },
-  handler: async () => {
-    const r = await knex.raw('SELECT * FROM coucou');
-
-    console.log(r);
-    return 'hello world';
-  },
+  handler,
 }
