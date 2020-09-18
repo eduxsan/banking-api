@@ -21,6 +21,10 @@ module.exports = {
     },
   },
   responseSchema: Joi.object({
-    originWalletUuid: Joi.string().uuid().required(),
+    companyFeeAmount: Joi.number().integer().positive().allow(0).required(),
+    newOriginWalletBalance: Joi.number().integer().positive().allow(0).required(),
+    newTargetWalletBalance: Joi.number().integer().positive().allow(0).required(),
+    // Optional as we may not change anything on the master wallet if there is no fee to apply
+    newMasterWalletBalance: Joi.number().integer().positive().allow(0),
   }).required(),
 }

@@ -10,9 +10,9 @@ module.exports = {
     tags: ['api'],
     validate: requestSchema,
     description: 'Transfers some money from a wallet to another',
-    // response: {
-    //   schema: responseSchema,
-    // },
+    response: {
+      schema: responseSchema,
+    },
   },
   handler, 
 }
