@@ -17,7 +17,7 @@ module.exports = async ({ headers: {[HEADERS.USER_IDENTIFIER]: userId } }, h) =>
         JOIN card c USING (wallet_uuid)
         WHERE c.user_uuid = :userUuid
       `,
-      { userUuid: userId},
+      { userUuid: userId },
     )
     .then(result => h.response(result.rows.map(formatWalletOutput)).code(200))
 };

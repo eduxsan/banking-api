@@ -16,7 +16,6 @@ module.exports = {
       return computeSameCurrencyBalances({ originWallet, targetWallet, amount });
     }
 
-    // We'll convert the amount, and get the percentage of fees from this converted amount.
     const convertedAmount = await currencyConverter.convertAmount({
       amount,
       originCurrency: originWallet.currencyCode,
