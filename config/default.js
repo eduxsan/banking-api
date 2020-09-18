@@ -8,12 +8,6 @@ module.exports = {
   },
   database: {
     engine: 'pg',
-    connection: {
-      host: '127.0.0.1',
-      database: 'bank',
-      user: 'postgres',
-      password: 'postgres',
-    },
   },
   fixer: {
     baseURL: 'http://data.fixer.io/api/',
