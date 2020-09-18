@@ -1,34 +1,17 @@
 'use strict';
 
-const Joi = require('joi');
-
 const handler = require('../../handlers/card/create');
-const { HEADERS } = require('../../constants');
-
-const validate = {
-  headers: Joi.object({
-    [HEADERS.COMPANY_IDENTIFIER]: Joi.string().uuid().required(),
-    [HEADERS.USER_IDENTIFIER]: Joi.string().uuid().required(),
-  }),
-  payload: Joi.object({
-    walletUuid: Joi.string().uuid().required(),
-  }),
-  options: {
-    allowUnknown: true,
-  },
-};
+const { requestSchema, responseSchema } = require('../../validation/card/create');
 
 module.exports = {
   method: 'POST',
-  path: '/card',
+  path: '/cards',
   options: {
     tags: ['api'],
-    validate,
+    validate: requestSchema,
     description: 'Creates a card associated to a wallet',
     response: {
-      schema: Joi.object({
-        cardUuid: Joi.string().uuid().required(),
-      }),
+      schema: responseSchema,
     },
   },
   handler, 

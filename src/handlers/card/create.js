@@ -27,11 +27,9 @@ module.exports = async (
     throw Boom.notFound('Could not find any wallet associated to given parameters');
   }
 
-  // Creating the card with random identifiers & numbers 
   const cardUuid = uuidv4();
-  const cardNumber = generateCardNumber();
-  const ccv = generateCcv();
 
+  // Creating the card with random identifiers & numbers
   await knex.raw(`
       INSERT INTO card (
         card_uuid,
@@ -59,9 +57,9 @@ module.exports = async (
     walletUuid: wallet.wallet_uuid,
     currencyCode: wallet.currency_code,
     balance: 0, // By default, assuming that a new card has no money on it
-    number: cardNumber,
+    number: generateCardNumber(),
     expirationDate: getCardExpirationDate(new Date()),
-    ccv,
+    ccv: generateCcv(),
     userUuid: userId,
     status: CARD_STATUS.ACTIVE, // Cards are active by default
   });
