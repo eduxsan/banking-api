@@ -13,14 +13,9 @@ const validate = {
   payload: Joi.object({
     currencyCode: Joi.string().length(3).valid(...currencies).required(),
     balance: Joi.number().integer().positive().required(),
-    isMasterWallet: Joi.boolean().required(),
   }),
   options: {
     allowUnknown: true,
-  },
-  failAction: (request, h, err) => {
-
-    throw err;
   },
 };
 

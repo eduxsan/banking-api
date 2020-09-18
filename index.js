@@ -10,7 +10,26 @@ const packageInfos = require('./package');
 const routes = require('./src/routes');
 
 const init = async () => {
-  const server = Hapi.server(serverConfig);
+  const server = Hapi.server({
+    ...serverConfig,
+    routes: {
+      validate: {
+        failAction: async (request, h, err) => {
+          if ('production' === process.env.NODE_ENV) {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            console.error('ValidationError:', err.message); // Better to use an actual logger here.
+            throw Boom.badRequest('Invalid request payload input');
+          } else {
+            // During development, log and respond with the full error.
+            console.error(err);
+            throw err;
+          }
+        },
+
+      },
+    },
+  },
+  );
 
   // Basic swagger options
   const swaggerOptions = {
@@ -31,18 +50,6 @@ const init = async () => {
   ]);
 
   server.route(routes);
-
-  // Overriding the way we expose responses in case of errors to force having a clearer output.
-  // In production, we'd probably need a better error handling strategy to obfuscate the errors enough,
-  // By still providing developer-readable error codes that could be handled by the frontend/by any consumer.
-  server.ext('onPreResponse', (request, h) => {
-    const response = request.response;
-    if (!response.isBoom) {
-      return h.continue;
-    }
-
-    return response;
-  });
 
   await server.start();
 

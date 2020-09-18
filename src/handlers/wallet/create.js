@@ -7,7 +7,7 @@ const { HEADERS } = require('../../constants');
 
 module.exports = async (
   {
-    payload: { currencyCode, balance, isMasterWallet },
+    payload: { currencyCode, balance },
     headers: { [HEADERS.COMPANY_IDENTIFIER]: companyId },
   },
   h,
@@ -33,7 +33,7 @@ module.exports = async (
     balance,
     currencyCode,
     companyUuid: companyId,
-    isMasterWallet,
+    isMasterWallet: false, // We don't permit any master creation per se. Master wallets are manually created.
   });
 
   return h.response({ walletUuid }).code(201);
